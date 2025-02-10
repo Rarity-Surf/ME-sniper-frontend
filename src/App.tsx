@@ -32,6 +32,11 @@ function App() {
     }
   });
 
+  const resetHiddenTokens = () => {
+    setHiddenTokens({});
+    localStorage.removeItem('hiddenTokens');
+  };
+
   // Convert IPFS CID to HTTP URL
   const getImageUrl = (image: string) => {
     if (image.startsWith('ipfs://')) {
@@ -111,6 +116,8 @@ function App() {
               onChange={(e) => setPercentile(Number(e.target.value))}
             />
           </label>
+
+        <button className="reset-button" onClick={resetHiddenTokens}>Reset Hidden Tokens</button>
         </div>
       </div>
 

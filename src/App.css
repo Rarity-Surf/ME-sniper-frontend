@@ -9,12 +9,31 @@
 
 .controls {
   display: flex;
+  align-items: center;
   gap: 20px;
   margin-bottom: 20px;
 }
 
+.reset-button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #f44336;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.reset-button:hover {
+  background-color: #d32f2f;
+}
+
+/*.filter {*/
+  /*flex: 1;*/
+/*}*/
 .filter {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between label and input */
 }
 
 .filter label {
