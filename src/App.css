@@ -2,6 +2,9 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
 }
 
 .controls {
@@ -23,6 +26,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
+  margin: 0 auto; /* Center the table */
 }
 
 th, td {
@@ -36,6 +40,7 @@ th, td {
   height: 50px;
   object-fit: cover;
   border-radius: 4px;
+  transition: transform 0.3s ease, z-index 0.3s ease;
 }
 
 .traits {
@@ -57,4 +62,18 @@ th, td {
   color: red;
   padding: 20px;
   text-align: center;
+}
+
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.image-container:hover .thumbnail {
+  transform: scale(5); /* Enlarge the image */
+  position: fixed; /* Position relative to the viewport */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%) scale(5); /* Adjust for centering */
+  z-index: 1000; /* Ensure it appears above other content */
 }

@@ -18,7 +18,7 @@ interface NFT {
 
 function App() {
   const [maxPrice, setMaxPrice] = useState<number>(100);
-  const [percentile, setPercentile] = useState<number>(100);
+  const [percentile, setPercentile] = useState<number>(10000);
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [hiddenTokens, setHiddenTokens] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
@@ -113,11 +113,16 @@ function App() {
                 <tr key={nft.tokenId}>
                   <td>
                     <a href={getImageUrl(nft.image)} target="_blank" rel="noopener noreferrer">
-                      <img 
-                        src={getImageUrl(nft.image)} 
-                        alt={nft.name} 
-                        className="thumbnail"
-                      />
+                      <div 
+                        className="image-container"
+                      >
+                        {/* Original Thumbnail */}
+                        <img 
+                          src={getImageUrl(nft.image)} 
+                          alt={nft.name} 
+                          className="thumbnail"
+                        />
+                        </div>
                     </a>
                   </td>
                   <td>{nft.rank}</td>
