@@ -112,11 +112,13 @@ function App() {
               .map(nft => (
                 <tr key={nft.tokenId}>
                   <td>
-                    <img 
-                      src={getImageUrl(nft.image)} 
-                      alt={nft.name} 
-                      className="thumbnail"
-                    />
+                    <a href={getImageUrl(nft.image)} target="_blank" rel="noopener noreferrer">
+                      <img 
+                        src={getImageUrl(nft.image)} 
+                        alt={nft.name} 
+                        className="thumbnail"
+                      />
+                    </a>
                   </td>
                   <td>{nft.rank}</td>
                   <td>{nft.price.toFixed(2)}</td>
