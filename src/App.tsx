@@ -158,7 +158,15 @@ function App() {
                     </li>
                   </ul>
                 </td>
-                <td>{nft.tokenId}</td>
+                <td>
+                  <a
+                    href={`https://magiceden.io/collections/${nft.chain}/${nft.contract}?search="${nft.tokenId}"`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {nft.tokenId}
+                  </a>
+                </td>
                 <td>
                   <input
                     type="checkbox"
