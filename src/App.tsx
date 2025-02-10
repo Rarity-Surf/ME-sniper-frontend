@@ -20,8 +20,17 @@ function App() {
   const [maxPrice, setMaxPrice] = useState<number>(100);
   const [percentile, setPercentile] = useState<number>(10000);
   const [nfts, setNfts] = useState<NFT[]>([]);
-  const [hiddenTokens, setHiddenTokens] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
+  const [hiddenTokens, setHiddenTokens] = useState<Record<string, number>>(() => {
+    // Load hidden tokens from localStorage on initial render
+    const stored = localStorage.getItem('hiddenTokens');
+    try {
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.error('Error parsing hiddenTokens:', e);
+      return {};
+    }
+  });
 
   // Convert IPFS CID to HTTP URL
   const getImageUrl = (image: string) => {
@@ -52,18 +61,30 @@ function App() {
     return () => clearInterval(intervalId);
   }, [maxPrice, percentile]);
 
-  // Toggle hidden NFTs
-  const toggleHidden = (tokenId: string) => {
+    // Persist hidden tokens to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('hiddenTokens', JSON.stringify(hiddenTokens));
+  }, [hiddenTokens]);
+
+
+  // Modified toggle function to store price
+  const toggleHidden = (nft: NFT) => {
     setHiddenTokens(prev => {
-      const next = new Set(prev);
-      if (next.has(tokenId)) {
-        next.delete(tokenId);
+      const newHidden = { ...prev };
+      if (newHidden[nft.tokenId] !== undefined) {
+        delete newHidden[nft.tokenId];
       } else {
-        next.add(tokenId);
+        newHidden[nft.tokenId] = nft.price;
       }
-      return next;
+      return newHidden;
     });
   };
+
+  // Updated filter logic
+  const visibleNfts = nfts.filter(nft => {
+    const hiddenPrice = hiddenTokens[nft.tokenId];
+    return hiddenPrice === undefined || nft.price < hiddenPrice;
+  });
 
   if (error) return <div className="error">{error}</div>;
 
@@ -105,9 +126,7 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {nfts
-            .filter(nft => !hiddenTokens.has(nft.tokenId))
-            .map(nft => (
+          {visibleNfts.map(nft => (
               <tr key={nft.tokenId}>
                 <td>
                   <a href={getImageUrl(nft.image)} target="_blank" rel="noopener noreferrer">
@@ -136,7 +155,8 @@ function App() {
                 <td>
                   <input
                     type="checkbox"
-                    onChange={() => toggleHidden(nft.tokenId)}
+                    checked={!!hiddenTokens[nft.tokenId]}
+                    onChange={() => toggleHidden(nft)}
                   />
                 </td>
               </tr>
