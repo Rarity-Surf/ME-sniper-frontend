@@ -88,11 +88,11 @@ th, td {
   display: inline-block;
 }
 
-.image-container:hover .thumbnail {
-  transform: scale(5); /* Enlarge the image */
-  position: fixed; /* Position relative to the viewport */
-  top: 50%; /* Center vertically */
-  left: 50%; /* Center horizontally */
-  transform: translate(-50%, -50%) scale(5); /* Adjust for centering */
-  z-index: 1000; /* Ensure it appears above other content */
-}
+/*.image-container:hover .thumbnail {*/
+  /*transform: scale(5); [> Enlarge the image <]*/
+  /*position: fixed; [> Position relative to the viewport <]*/
+  /*top: 50%; [> Center vertically <]*/
+  /*left: 50%; [> Center horizontally <]*/
+  /*transform: translate(-50%, -50%) scale(5); [> Adjust for centering <]*/
+  /*z-index: 1000; [> Ensure it appears above other content <]*/
+/*}*/
