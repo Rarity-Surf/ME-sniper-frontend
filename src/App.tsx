@@ -21,7 +21,6 @@ function App() {
   const [percentile, setPercentile] = useState<number>(10000);
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [hiddenTokens, setHiddenTokens] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Convert IPFS CID to HTTP URL
@@ -32,23 +31,25 @@ function App() {
     return image;
   };
 
-  // Fetch NFTs with debounce
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
         const response = await fetch(`/api/nfts?maxPrice=${maxPrice}&percentile=${percentile}`);
         const data = await response.json();
         setNfts(data);
       } catch (err) {
         setError('Failed to fetch NFTs');
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
-    const debounceTimer = setTimeout(fetchData, 500);
-    return () => clearTimeout(debounceTimer);
+    // Optionally, you might want to fetch immediately on mount:
+    fetchData();
+
+    // Set up polling every 2000ms (2 seconds)
+    const intervalId = setInterval(fetchData, 2000);
+
+    // Clean up the interval on unmount or when dependencies change
+    return () => clearInterval(intervalId);
   }, [maxPrice, percentile]);
 
   // Toggle hidden NFTs
@@ -69,16 +70,16 @@ function App() {
   return (
     <div className="app">
       <div className="controls">
-      <div className="filter">
-        <label>
-          Max Price:
-          <input
-            type="number"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(Number(e.target.value))}
-          />
-        </label>
-      </div>
+        <div className="filter">
+          <label>
+            Max Price:
+            <input
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+            />
+          </label>
+        </div>
 
         <div className="filter">
           <label>
@@ -92,62 +93,56 @@ function App() {
         </div>
       </div>
 
-      {loading ? (
-        <div className="loading">Loading...</div>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Rank</th>
-              <th>Price</th>
-              <th>Top Traits</th>
-              <th>Token ID</th>
-              <th>Hide</th>
-            </tr>
-          </thead>
-          <tbody>
-            {nfts
-              .filter(nft => !hiddenTokens.has(nft.tokenId))
-              .map(nft => (
-                <tr key={nft.tokenId}>
-                  <td>
-                    <a href={getImageUrl(nft.image)} target="_blank" rel="noopener noreferrer">
-                      <div 
-                        className="image-container"
-                      >
-                        {/* Original Thumbnail */}
-                        <img 
-                          src={getImageUrl(nft.image)} 
-                          alt={nft.name} 
-                          className="thumbnail"
-                        />
-                        </div>
-                    </a>
-                  </td>
-                  <td>{nft.rank}</td>
-                  <td>{nft.price.toFixed(2)}</td>
-                  <td>
-                    <ul className="traits">
-                      {nft.topRarestTraits.map((trait, i) => (
-                        <li key={i}>
-                          {trait.trait}: {trait.value} ({trait.rarity})
-                        </li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td>{nft.tokenId}</td>
-                  <td>
-                    <input
-                      type="checkbox"
-                      onChange={() => toggleHidden(nft.tokenId)}
-                    />
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      )}
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Rank</th>
+            <th>Price</th>
+            <th>Top Traits</th>
+            <th>Token ID</th>
+            <th>Hide</th>
+          </tr>
+        </thead>
+        <tbody>
+          {nfts
+            .filter(nft => !hiddenTokens.has(nft.tokenId))
+            .map(nft => (
+              <tr key={nft.tokenId}>
+                <td>
+                  <a href={getImageUrl(nft.image)} target="_blank" rel="noopener noreferrer">
+                    <div className="image-container">
+                      {/* Original Thumbnail */}
+                      <img 
+                        src={getImageUrl(nft.image)} 
+                        alt={nft.name} 
+                        className="thumbnail"
+                      />
+                    </div>
+                  </a>
+                </td>
+                <td>{nft.rank}</td>
+                <td>{nft.price.toFixed(2)}</td>
+                <td>
+                  <ul className="traits">
+                    <li>
+                      {nft.topRarestTraits
+                        .map((trait) => `${trait.trait}: ${trait.value} (${trait.rarity})`)
+                        .join(', ')}
+                    </li>
+                  </ul>
+                </td>
+                <td>{nft.tokenId}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    onChange={() => toggleHidden(nft.tokenId)}
+                  />
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
     </div>
   );
 }
