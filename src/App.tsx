@@ -46,7 +46,8 @@ function App() {
   // Convert IPFS CID to HTTP URL
   const getImageUrl = (image: string) => {
     if (image.startsWith('ipfs://')) {
-      return `https://gateway.pinata.cloud/ipfs/${image.split('ipfs://')[1]}`;
+      //return `https://gateway.pinata.cloud/ipfs/${image.split('ipfs://')[1]}`;
+      return `https://flk-ipfs.xyz/ipfs/${image.split('ipfs://')[1]}`;
       //return `http://127.0.0.1:5001/ipfs/${image.split('ipfs://')[1]}`;
       //console.log(`https://gateway.pinata.cloud/ipfs/${image.split('ipfs://')[1]}`)
       //console.log( `http://127.0.0.1:5001/api/v0/cat?arg=${image.split('ipfs://')[1]}`)
@@ -213,20 +214,18 @@ function App() {
             <tr key={nft.tokenId}>
               <td>
                 <a href={imageUrls[nft.tokenId] || getImageUrl(nft.image)} target="_blank" rel="noopener noreferrer">
-                  {nft.name}
+                  {/* nft.name */}
                   <div className="image-container">
                     {/* Use fetched image URL if available, otherwise fallback */}
-                    {
-                    //<img
-                      //src={imageUrls[nft.tokenId] || getImageUrl(nft.image)}
-                      //alt={nft.name}
-                      //className="thumbnail"
-                      //loading="lazy" // Lazy load images
-                      //onError={(e) => {
-                        //e.target.src = 'path/to/fallback-image.jpg'; // Fallback image
-                      //}}
-                    ///>
-                    }
+                    <img
+                      src={imageUrls[nft.tokenId] || getImageUrl(nft.image)}
+                      alt={nft.name}
+                      className="thumbnail"
+                      loading="lazy" // Lazy load images
+                      onError={(e) => {
+                        e.target.src = 'path/to/fallback-image.jpg'; // Fallback image
+                      }}
+                    />
                   </div>
                 </a>
               </td>
