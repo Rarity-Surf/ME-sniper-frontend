@@ -47,6 +47,8 @@ function App() {
   const getImageUrl = (image: string) => {
     if (image.startsWith('ipfs://')) {
       //return `https://gateway.pinata.cloud/ipfs/${image.split('ipfs://')[1]}`;
+      console.log(image);
+      console.log(`https://flk-ipfs.xyz/ipfs/${image.split('ipfs://')[1]}`);
       return `https://flk-ipfs.xyz/ipfs/${image.split('ipfs://')[1]}`;
       //return `http://127.0.0.1:5001/ipfs/${image.split('ipfs://')[1]}`;
       //console.log(`https://gateway.pinata.cloud/ipfs/${image.split('ipfs://')[1]}`)
@@ -120,6 +122,7 @@ function App() {
       try {
         const response = await fetch(`/api/nfts?maxPrice=${maxPrice}&percentile=${percentile}`);
         const data = await response.json();
+        console.log(data)
         setNfts(data);
       } catch (err) {
         setError('Failed to fetch NFTs');
@@ -215,17 +218,20 @@ function App() {
               <td>
                 <a href={imageUrls[nft.tokenId] || getImageUrl(nft.image)} target="_blank" rel="noopener noreferrer">
                   {/* nft.name */}
+                  {nft.name}
                   <div className="image-container">
                     {/* Use fetched image URL if available, otherwise fallback */}
-                    <img
-                      src={imageUrls[nft.tokenId] || getImageUrl(nft.image)}
-                      alt={nft.name}
-                      className="thumbnail"
-                      loading="lazy" // Lazy load images
-                      onError={(e) => {
-                        e.target.src = 'path/to/fallback-image.jpg'; // Fallback image
-                      }}
-                    />
+                    {
+                      //<img
+                      //src={imageUrls[nft.tokenId] || getImageUrl(nft.image)}
+                      //alt={nft.name}
+                      //className="thumbnail"
+                      //loading="lazy" // Lazy load images
+                      //onError={(e) => {
+                        //e.target.src = 'path/to/fallback-image.jpg'; // Fallback image
+                      //}}
+                    ///>
+                    }
                   </div>
                 </a>
               </td>
@@ -242,7 +248,7 @@ function App() {
               </td>
               <td>
                 <a
-                  href={`https://magiceden.io/collections/${nft.chain}/${nft.contract}?search="${nft.tokenId}"`}
+                  href={`https://magiceden.io/item-details/${nft.chain}/${nft.contract}/${nft.tokenId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
