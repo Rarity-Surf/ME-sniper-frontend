@@ -194,7 +194,7 @@ function App() {
 
         <div className="filter">
           <label>
-            Rank:
+            Percentile:
             <input
               type="text"
               value={percentile}
@@ -215,8 +215,8 @@ function App() {
         <thead>
           <tr>
             <th>Image</th>
-            <th>Rank</th>
             <th>Percentile</th>
+            <th>Rank</th>
             <th>Price</th>
             <th>Top Traits</th>
             <th>Token ID</th>
@@ -246,7 +246,6 @@ function App() {
                   </div>
                 </a>
               </td>
-              <td>{nft.rank}</td>
               <td
                 style={{
                   backgroundColor: (() => {
@@ -264,6 +263,7 @@ function App() {
                 return `${formattedPercentage}%`;
               })()}
               </td>
+              <td>{`${nft.rank}/${revealed}`}</td>
               <td>{nft.price.toFixed(4)}</td>
               <td>
                 <ul className="traits">
