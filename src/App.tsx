@@ -59,27 +59,6 @@ function App() {
     return image;
   };
 
-  // Fetch image from IPFS and cache the URL
-  const fetchImageFromIPFS = async (cid: string, tokenId: string) => {
-    try {
-      const chunks = [];
-      for await (const chunk of ipfs.cat(cid)) {
-        chunks.push(chunk);
-      }
-
-      const imageData = new Uint8Array(chunks.reduce((acc, chunk) => [...acc, ...chunk], []));
-      const blob = new Blob([imageData], { type: 'image/jpeg' }); // Adjust MIME type as needed
-      const imageUrl = URL.createObjectURL(blob);
-
-      // Cache the image URL in state
-      setImageUrls((prev) => ({ ...prev, [tokenId]: imageUrl }));
-    } catch (error) {
-      console.error('Error fetching image from IPFS:', error);
-      // Optionally, set a fallback image URL in case of error
-      setImageUrls((prev) => ({ ...prev, [tokenId]: 'path/to/fallback-image.jpg' }));
-    }
-  };
-
   // Fetch images for all NFTs
   //useEffect(() => {
     //const fetchImages = async () => {
@@ -119,18 +98,6 @@ function App() {
   //}, [maxPrice, percentile]);
 
   useEffect(() => {
-    //const fetchData = async () => {
-      //try {
-        //const response = await fetch(`/api/nfts?maxPrice=${maxPrice}&percentile=${percentile}`);
-        //const data = await response.json();
-        //console.log(data)
-        //setNfts(data.nfts);
-        //setRevealed(data.revealed);
-      //} catch (err) {
-        //setError('Failed to fetch NFTs');
-      //} 
-    //};
-    //const fetchNFTs = async (maxPrice, percentile, retries = 3, delay = 1000) => {
     const fetchNFTs = async (maxPrice = 0, percentile = 0, retries = 3, delay = 1000) => {
       try {
         const response = await fetch(`/api/nfts?maxPrice=${maxPrice}&percentile=${percentile}`);
@@ -280,7 +247,23 @@ function App() {
                 </a>
               </td>
               <td>{nft.rank}</td>
-              <td>{`${Math.round((nft.rank / revealed) * 100)}%`}</td>
+              <td
+                style={{
+                  backgroundColor: (() => {
+                    const percentage = (nft.rank / revealed) * 100;
+                    if (percentage < 1) return 'red'; // Red if <1%
+                    if (percentage < 5) return 'yellow'; // Yellow if <5%
+                    if (percentage < 10) return 'green'; // Green if <10%
+                    return ''; // Default (no background color)
+                  })(),
+                }}
+              >
+              {(() => {
+                const percentage = (nft.rank / revealed) * 100;
+                const formattedPercentage = percentage.toFixed(1);
+                return `${formattedPercentage}%`;
+              })()}
+              </td>
               <td>{nft.price.toFixed(4)}</td>
               <td>
                 <ul className="traits">
