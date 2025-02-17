@@ -25,6 +25,7 @@ function App() {
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [percentile, setPercentile] = useState<string>('');
   const [nfts, setNfts] = useState<NFT[]>([]);
+  const [revealed, setRevealed] = useState<string>('');
   const [error, setError] = useState('');
   const [hiddenTokens, setHiddenTokens] = useState<Record<string, number>>(() => {
     // Load hidden tokens from localStorage on initial render
@@ -47,8 +48,8 @@ function App() {
   const getImageUrl = (image: string) => {
     if (image.startsWith('ipfs://')) {
       //return `https://gateway.pinata.cloud/ipfs/${image.split('ipfs://')[1]}`;
-      console.log(image);
-      console.log(`https://flk-ipfs.xyz/ipfs/${image.split('ipfs://')[1]}`);
+      //console.log(image);
+      //console.log(`https://flk-ipfs.xyz/ipfs/${image.split('ipfs://')[1]}`);
       return `https://flk-ipfs.xyz/ipfs/${image.split('ipfs://')[1]}`;
       //return `http://127.0.0.1:5001/ipfs/${image.split('ipfs://')[1]}`;
       //console.log(`https://gateway.pinata.cloud/ipfs/${image.split('ipfs://')[1]}`)
@@ -118,25 +119,64 @@ function App() {
   //}, [maxPrice, percentile]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    //const fetchData = async () => {
+      //try {
+        //const response = await fetch(`/api/nfts?maxPrice=${maxPrice}&percentile=${percentile}`);
+        //const data = await response.json();
+        //console.log(data)
+        //setNfts(data.nfts);
+        //setRevealed(data.revealed);
+      //} catch (err) {
+        //setError('Failed to fetch NFTs');
+      //} 
+    //};
+    //const fetchNFTs = async (maxPrice, percentile, retries = 3, delay = 1000) => {
+    const fetchNFTs = async (maxPrice = 0, percentile = 0, retries = 3, delay = 1000) => {
       try {
         const response = await fetch(`/api/nfts?maxPrice=${maxPrice}&percentile=${percentile}`);
+
+        if (!response.ok) {
+          if (response.status === 500 && retries > 0) {
+            // Retry after a delay
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return fetchNFTs(maxPrice, percentile, retries - 1, delay * 2); // Exponential backoff
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+
         const data = await response.json();
-        console.log(data)
-        setNfts(data);
+        console.log(data);
+        setNfts(data.nfts);
+        setRevealed(data.revealed);
       } catch (err) {
-        setError('Failed to fetch NFTs');
-      } 
+        if (retries > 0) {
+          // Retry after a delay
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return fetchNFTs(maxPrice, percentile, retries - 1, delay * 2); // Exponential backoff
+        } else {
+          setError('Failed to fetch NFTs');
+        }
+      }
     };
 
+    // Usage
+    fetchNFTs(maxPrice, percentile);
+
     // Optionally, you might want to fetch immediately on mount:
-    fetchData();
+    //fetchData();
 
     // Set up polling every 2000ms (2 seconds)
-    const intervalId = setInterval(fetchData, 2000);
+    //const intervalId = setInterval(fetchData, 5000);
+    //const intervalId = setInterval(fetchNFTs(maxPrice, percentile), 2000);
+    // Set up polling every 2000ms (2 seconds)
+    const intervalId = setInterval(() => {
+      fetchNFTs(maxPrice, percentile);
+    }, 2000);
 
     // Clean up the interval on unmount or when dependencies change
     return () => clearInterval(intervalId);
+
   }, [maxPrice, percentile]);
 
   // Persist hidden tokens to localStorage whenever they change
@@ -195,6 +235,9 @@ function App() {
             />
           </label>
 
+          <div>
+            Revealed: {revealed}
+          </div>
           <button className="reset-button" onClick={resetHiddenTokens}>
             Reset Hidden Tokens
           </button>
@@ -206,6 +249,7 @@ function App() {
           <tr>
             <th>Image</th>
             <th>Rank</th>
+            <th>Percentile</th>
             <th>Price</th>
             <th>Top Traits</th>
             <th>Token ID</th>
@@ -236,6 +280,7 @@ function App() {
                 </a>
               </td>
               <td>{nft.rank}</td>
+              <td>{`${Math.round((nft.rank / revealed) * 100)}%`}</td>
               <td>{nft.price.toFixed(4)}</td>
               <td>
                 <ul className="traits">
