@@ -26,6 +26,7 @@ function App() {
   const [percentile, setPercentile] = useState<string>('');
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [revealed, setRevealed] = useState<string>('');
+  const [supply, setSupply] = useState<string>('');
   const [error, setError] = useState('');
   const [hiddenTokens, setHiddenTokens] = useState<Record<string, number>>(() => {
     // Load hidden tokens from localStorage on initial render
@@ -116,6 +117,8 @@ function App() {
         console.log(data);
         setNfts(data.nfts);
         setRevealed(data.revealed);
+        setSupply(data.supply);
+        //console.log(data.supply)
       } catch (err) {
         if (retries > 0) {
           // Retry after a delay
@@ -203,7 +206,12 @@ function App() {
           </label>
 
           <div>
-            Revealed: {revealed}
+            Revealed: {revealed}/{supply} 
+            {(() => {
+              const percentage = revealed/supply * 100
+              const formattedPercentage = percentage.toFixed(1);
+              return ` (${formattedPercentage}%)`;
+            })()}
           </div>
           <button className="reset-button" onClick={resetHiddenTokens}>
             Reset Hidden Tokens
